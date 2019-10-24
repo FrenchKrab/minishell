@@ -18,11 +18,8 @@ char* clean_str(char* str) {
     int trueStartIndex = 0;
     for (int i = 0; i<strLen; ++i)
     {
-        if(str[i] == ' ')
-        {
-            trueStartIndex = i;
-        }
-        else
+        trueStartIndex = i;
+        if(str[i] != ' ')
         {
             break;
         }
@@ -31,6 +28,7 @@ char* clean_str(char* str) {
     //+1 pour prendre le \0 de fin de chaine
     memmove(str, str + trueStartIndex, strLen - trueStartIndex + 1);
     strLen = strlen(str);
+    //printf("OK 1");
 
     for(int i = strLen - 1; i>=0; --i)
     {
@@ -43,6 +41,7 @@ char* clean_str(char* str) {
             break;
         }
     }
+    strLen = strlen(str);
 
     // Etat actuel : "str1    str2"
 
@@ -84,7 +83,7 @@ char* clean_str(char* str) {
         {
             if(previousWasSpace)
             {
-                memmove(str[start],str[end], strLen-end+1);
+                memmove(str + start,str + end, strLen-end+1);
                 i = start + 1;
             }
             previousWasSpace = 0;
@@ -103,6 +102,8 @@ size_t split_str(char* str, char* tokens[]) {
 
 
     // Renvoie le nombre d'éléments dans le tableau tokens
+
+    return 0;   //temporaire
 }
 
 
@@ -118,4 +119,5 @@ int set_envs(char* tokens[]) {
 
     // Renvoie le nombre de variables substituées
 
+    return 0;   //temporaire, debug
 }
