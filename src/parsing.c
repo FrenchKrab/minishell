@@ -101,18 +101,20 @@ size_t split_str(char* str, char* tokens[]) {
     assert(tokens!=NULL);
 
     //abc\0dhfjd fhrj trur
-    tokens[0] = str[0];
+    tokens[0] = str;
 
     size_t compteur = 1;
-    for(int i=1; i<strlen(str); i++)
+    size_t strsize = strlen(str);
+    for(int i=0; i<strsize; ++i)
     {
-        if(strcmp(str[i],' ')==0)
+        if(str[i]==' ')
         {
             str[i] = '\0';
-            tokens[compteur] = str[i+1];
+            tokens[compteur] = &str[i+1];
             compteur++;
         }
     }
+    tokens[compteur]=NULL;
 
     // Renvoie le nombre d'éléments dans le tableau tokens
     return compteur;

@@ -9,7 +9,15 @@ int main(int argc, char* argv[])
     char* cmds[MAXCMD];
     cmdline[MAXSTRSIZE-1] = '\0';
 
-    while (1)
+    char *test = strdup("    1aaaa 2     3 4  df  ");
+    char *tokens[MAXCMD];
+    clean_str(test);
+    split_str(test, tokens);
+    for (char **tok=tokens; *tok!=NULL;++tok)
+        printf("-%s-\n",*tok);
+
+
+    /*while (1)
     {
         printf("$");
         fgets(cmdline, MAXSTRSIZE-1, stdin);
@@ -18,7 +26,7 @@ int main(int argc, char* argv[])
         //set_envs(cmds);             //cmds = {"chaine", "chaine", "login", NULL}
         if (strcmp(cmds[0], "exit")==0)
             break;
-    }
+    }*/
 
     return 0;
 }
