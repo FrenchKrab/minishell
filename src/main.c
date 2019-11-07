@@ -13,10 +13,13 @@ int main(int argc, char* argv[])
     char* cmds[MAXCMD];
     cmdline[MAXSTRSIZE-1] = '\0';
 
-    char *test = strdup("    1aaaa 2     3 4  df  ");
+    char *test = strdup("1aaaa 2 $USER 4 df");
     char *tokens[MAXCMD];
-    clean_str(test);
     split_str(test, tokens);
+    for (char **tok=tokens; *tok!=NULL;++tok)
+        printf("-%s-\n",*tok);
+    set_envs(tokens);
+    printf("\n\n");
     for (char **tok=tokens; *tok!=NULL;++tok)
         printf("-%s-\n",*tok);
 

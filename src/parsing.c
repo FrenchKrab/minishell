@@ -115,17 +115,29 @@ size_t split_str(char* str, char* tokens[]) {
 }
 
 
+/*Fonction set_envs
+Paramètre tokens[] : le tableau d'élements où il faut substituer les variables d'environnement
+Retourne un int, le nombre de variables substituées*/
 int set_envs(char* tokens[]) {
     assert(tokens!=NULL);
 
-    // Cherche toutes les chaînes du tableau commençant par '$'
-    // Récupère la variable d'environnement correspondante et
-    // la substitue à l'élément du tableau
-    // Attention: si la variable n'est pas définie on utilisera
-    // la chaîne vide "" (et pas NULL)
-
-
+    size_t compteur = 0;
+    for(size_t i=0; tokens[i]!=NULL; ++i)
+    {
+        char* elem = tokens[i];
+        //Cherche toutes les chaînes du tableau commençant par '$'
+        if(elem[0]=='$')
+        {
+            //On récupère la variable d'environnement correspondante et la substitue à l'élément du tableau
+            char *var = getenv(elem+1);
+            printf("variable %s = %s",elem, var);
+            if(var!=NULL)
+                tokens[i]=var;
+            else    //Si la variable n'est pas définie on utilise la chaîne vide "" (et pas NULL)
+                tokens[i]="";
+            compteur++;
+        }
+    }
     // Renvoie le nombre de variables substituées
-
-    return 0;   //temporaire, debug
+    return compteur;
 }
