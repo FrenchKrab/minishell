@@ -95,14 +95,17 @@ char* clean_str(char* str) {
 }
 
 
+/*Fonction split_str
+Paramètre str : la chaine à split
+Paramètre tokens[] : le tableau contenant les éléments séparés
+Retourne un size_t, le nombre d'éléments dans le tableau tokens*/
+
 // Découper la chaîne de caractères en ses différents éléments
 size_t split_str(char* str, char* tokens[]) {
     assert(str!=NULL);
     assert(tokens!=NULL);
 
-    //abc\0dhfjd fhrj trur
     tokens[0] = str;
-
     size_t compteur = 1;
     size_t strsize = strlen(str);
     for(int i=0; i<strsize; ++i)
