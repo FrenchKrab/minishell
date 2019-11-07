@@ -2,7 +2,7 @@ CC ?= gcc
 CFLAGS ?= -Wall -O2
 EXEC := main
 
-OBJS_main := main.o parsing.o
+OBJS_main := main.o parsing.o process.o
 
 .PHONY: clean
 

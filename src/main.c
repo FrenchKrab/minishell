@@ -5,7 +5,9 @@ Dépendances : parsing.h*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "parsing.h"
+#include "process.h"
 
 int main(int argc, char* argv[])
 {
@@ -23,6 +25,21 @@ int main(int argc, char* argv[])
     for (char **tok=tokens; *tok!=NULL;++tok)
         printf("-%s-\n",*tok);
 
+    process_t process_info;
+    process_info.path = "/bin/ls";
+
+    int i = 0;
+    do
+    {
+        process_info.argv[i] = tokens[i];
+    } while (tokens[i]!=NULL);
+    
+    process_info.background = 1;
+    process_info.stdin = STDIN_FILENO;
+    process_info.stdout = STDOUT_FILENO;
+    process_info.stderr = STDERR_FILENO;
+
+    exec_process(&process_info);
 
     /*while (1)
     {
