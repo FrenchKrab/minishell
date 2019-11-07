@@ -43,6 +43,8 @@ char* clean_str(char* str) {
     }
     strLen = strlen(str);
 
+
+
     // Etat actuel : "str1    str2"
 
     // Supprimer les doublons d'espaces entre les mots de la ligne
@@ -61,23 +63,25 @@ char* clean_str(char* str) {
     }
     */
 
+   
    //methode opti mais qui marche peut etre pas
-    int start = 0;
-    int end = 0;
-    int previousWasSpace = 0;
+    int start = 0;  //début d'une série d'espaces
+    int end = 0;    //fin de la série d'espaces
+    int previousWasSpace = 0;   //boolean : est-ce que le dernier caractère était un espace ?
     for(int i = 0; i < strLen; ++i)
     {
-        if(str[i]==' ')
+        if(str[i]==' ') //On est sur un espace
         {
-            if(previousWasSpace)
+            if(previousWasSpace)    //le dernier caractere était aussi un espace
             {
                 end = i;
             }
             else
             {
                 start = i;
+                end = i;
+                previousWasSpace = 1;
             }
-            previousWasSpace = 1;
         }
         else
         {
@@ -85,10 +89,11 @@ char* clean_str(char* str) {
             {
                 memmove(str + start,str + end, strLen-end+1);
                 i = start + 1;
+                previousWasSpace = 0;
             }
-            previousWasSpace = 0;
         }
     }
+    
     
 
     return str;
