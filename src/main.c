@@ -7,15 +7,15 @@ int main(int argc, char* argv[])
 {
     char cmdline[MAXSTRSIZE];
     char* cmds[MAXCMD];
-    cmdline[MAXSTRSIZE-1] = NULL;
+    cmdline[MAXSTRSIZE-1] = '\0';
 
     while (1)
     {
         printf("$");
         fgets(cmdline, MAXSTRSIZE-1, stdin);
-        clean_str(cmdline);         //"  chaine   chaine   $USER  " --> "chaine chaine $USER"
+        //clean_str(cmdline);         //"  chaine   chaine   $USER  " --> "chaine chaine $USER"
         split_str(cmdline, cmds);   //split mot à mot : cmds = {"chaine", "chaine", "$USER", NULL}
-        set_envs(cmds);             //cmds = {"chaine", "chaine", "login", NULL}
+        //set_envs(cmds);             //cmds = {"chaine", "chaine", "login", NULL}
         if (strcmp(cmds[0], "exit")==0)
             break;
     }
