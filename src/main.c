@@ -1,3 +1,7 @@
+/*Fichier main.c: Contient la fonction main permettant l'execution du programme
+Auteur : Alexis Plaquet, Tom Rivero
+Dépendances : parsing.h*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

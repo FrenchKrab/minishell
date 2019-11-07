@@ -1,3 +1,7 @@
+/*Fichier parsing.c: parsing simple et gesiton des variables d'environnement
+Auteur : Alexis Plaquet, Tom Rivero
+Dépendances : parsing.h*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,14 +9,16 @@
 
 #include "parsing.h"
 
-// "Nettoyer" la chaîne de caractères
+/*Fonction clean_str
+Paramètre str : chaine de caractères à nettoyer
+Retourne la chaine nettoyée
+*/
 char* clean_str(char* str) {
     assert(str!=NULL);
     assert(strlen(str)<MAXSTRSIZE);
 
     // Supprimer les blancs au début et à la fin de la ligne
     // Ex: "   str1    str2    " => "str1    str2"
-
 
     int strLen = strlen(str);
     int trueStartIndex = 0;
@@ -28,7 +34,6 @@ char* clean_str(char* str) {
     //+1 pour prendre le \0 de fin de chaine
     memmove(str, str + trueStartIndex, strLen - trueStartIndex + 1);
     strLen = strlen(str);
-    //printf("OK 1");
 
     for(int i = strLen - 1; i>=0; --i)
     {
@@ -42,29 +47,11 @@ char* clean_str(char* str) {
         }
     }
     strLen = strlen(str);
-
-
-
     // Etat actuel : "str1    str2"
 
     // Supprimer les doublons d'espaces entre les mots de la ligne
     // Ex: "str1    str2  str3" => "str1 str2 str3"
 
-    /* Methode pas opti
-    strLen = strlen(str);
-    for(int i = 0; i < strLen - 1; ++i)
-    {
-        if(str[i]==' ' && str[i+1]==' ')
-        {
-            //+2 pour prendre le \0 de fin de chaine
-            memmove(str[i],str[i+1], strLen-i+2);
-            strLen = strlen(str);
-        }
-    }
-    */
-
-   
-   //methode opti mais qui marche peut etre pas
     int start = 0;  //début d'une série d'espaces
     int end = 0;    //fin de la série d'espaces
     int previousWasSpace = 0;   //boolean : est-ce que le dernier caractère était un espace ?
@@ -76,25 +63,24 @@ char* clean_str(char* str) {
             {
                 end = i;
             }
-            else
+            else    //c'est le premier espace rencontré
             {
                 start = i;
                 end = i;
                 previousWasSpace = 1;
             }
         }
-        else
+        else    //On n'est pas sur un espace
         {
-            if(previousWasSpace)
+            if(previousWasSpace)    //Et le dernier caractere était un espace
             {
+                //Déplacer la chaine pour enlever les espaces redondants
                 memmove(str + start,str + end, strLen-end+1);
                 i = start + 1;
                 previousWasSpace = 0;
             }
         }
     }
-    
-    
 
     return str;
 }
