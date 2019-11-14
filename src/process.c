@@ -1,18 +1,21 @@
+/*Fichier process.c: lancement de processus
+Auteur : Alexis Plaquet, Tom Rivero
+Dépendances : process.h*/
 #include <unistd.h>
 #include <sys/wait.h>
 
 #include "process.h"
 
-// Lance un nouveau processus qui exécute le programme passé en paramètre
-// dans la structure proc. La fonction attend la fin de l'exécution si
-// proc.background != 0. Les entrées/sorties sont redirigées si nécessaire.
-// Le PID du nouveau processus est stocké dans proc.pid. À la fin de l'exécution
-// proc.status récupère le status de la commande tel que retourné par waitpid()
+/*Fonction exec_process
+Paramètre proc : informations liées au processus à executer
+Retourne 0 si tout s'est bien déroulé, et autre chose en cas d'erreur*/
 int exec_process(process_t* proc) {
-    int child_pid = fork();
+    int child_pid = fork();     //on fork
 
-    if(child_pid == 0)  //Le fils
+    if(child_pid == 0)  //Si on est le fils
     {
+        //Si le stdin/out/err est différent de son descripteur de fichier standard
+        //alors fermer le standard et dupliquer le nouveau à sa place.
         if(proc->stdin != STDIN_FILENO)
             dup2(proc->stdin, STDIN_FILENO);
 
@@ -22,15 +25,23 @@ int exec_process(process_t* proc) {
         if(proc->stderr != STDERR_FILENO)
             dup2(proc->stderr, STDERR_FILENO);
 
+        //Executer le processus
         execv(proc->path, proc->argv);
+        exit(1);
     }
-    else    //Le père
+    else    //Si on est le père
     {
         proc->pid = child_pid;
         if(proc->background!=0) //Si on ne lance pas en background
         {
+            //Attendre que le fils ait terminé son execution
             proc->status = waitpid(child_pid, NULL, 0);
         }
+        else
+        {
+            proc->status = 0;
+        }
+        
     }
-    return 0;
+    return proc->status;
 }

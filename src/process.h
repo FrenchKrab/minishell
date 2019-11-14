@@ -1,3 +1,7 @@
+/*Fichier process.h: définiton de la structure process_t
+Auteur : Alexis Plaquet, Tom Rivero
+Dépendances : parsing.h*/
+
 #ifndef PROCESS_H
 #define PROCESS_H
 

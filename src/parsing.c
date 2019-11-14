@@ -1,4 +1,4 @@
-/*Fichier parsing.c: parsing simple et gesiton des variables d'environnement
+/*Fichier parsing.c: parsing simple et gestion des variables d'environnement
 Auteur : Alexis Plaquet, Tom Rivero
 Dépendances : parsing.h*/
 
