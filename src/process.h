@@ -8,16 +8,19 @@ Dépendances : parsing.h*/
 #include <sys/types.h>
 #include "parsing.h"
 
-typedef struct {
+typedef struct process{
   char* path;
-  char* argv[MAXCMD];
+  char** argv;
   int stdin, stdout, stderr;
   int status;
   pid_t pid;
   int background;
+  struct process* next;
+  struct process* next_failure;
+  struct process* next_succes;
   
-} process_t;
+};
 
-int exec_process(process_t* proc);
+int exec_process(process* proc);
 
 #endif
