@@ -57,7 +57,7 @@ char* clean_str(char* str) {
     int previousWasSpace = 0;   //boolean : est-ce que le dernier caractère était un espace ?
     for(int i = 0; i < strLen; ++i)
     {
-        if(str[i]==' ') //On est sur un espace
+        if(str[i]==' ' || str[i]=='\n') //On est sur un espace
         {
             if(previousWasSpace)    //le dernier caractere était aussi un espace
             {

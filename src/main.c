@@ -17,23 +17,51 @@ Dépendances : parsing.h*/
 int main(int argc, char* argv[])
 {
     char cmdline[MAXSTRSIZE];
-    char* cmds[MAXCMD];
-    cmdline[MAXSTRSIZE-1] = '\0';
-
-    char *test = strdup("cat");
     char *tokens[MAXCMD];
-    split_str(test, tokens);
+    process commands[MAXCMD];
 
-    set_envs(tokens);
-    printf("args:\n");
+    while(1)
+    {
+   
+        printf("%s$", getenv("USER"));
+        fgets(cmdline, MAXSTRSIZE, stdin);
 
-    for (char **tok=tokens; *tok!=NULL;++tok)
-        printf(">%s<\n",*tok);
 
+        clean_str(cmdline);
+        split_str(cmdline, tokens);
+        set_envs(tokens);
+
+
+/*
+        printf("--args:%p\n", tokens);
+
+        for (char **tok=tokens; *tok!=NULL;++tok)
+        {
+            printf(">%s<\n",*tok);
+        }
+*/
+        process process_info;
+
+        process_info.argv = tokens;
+        
+
+        process_info.path = process_info.argv[0];
+        //process_info.path = "/bin/ls";
+
+        process_info.background = 1;
+        process_info.stdin = STDIN_FILENO;
+        //process_info.stdin = open("prout.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        process_info.stdout = STDOUT_FILENO;
+        //process_info.stdout = open("prout2.txt", O_WRONLY | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR);
+        process_info.stderr = STDERR_FILENO;
+
+
+        exec_process(&process_info);
+    }
+    
+    /*
     process process_info;
     process_info.path = "/bin/cat";
-
-    printf("Debut de phase buggée\n");
 
     //Copier tous les tokens dans argv (y compris le dernier, NULL)
     int i = -1;
@@ -48,11 +76,16 @@ int main(int argc, char* argv[])
     process_info.stdin = STDIN_FILENO;
     //process_info.stdin = open("prout.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
     process_info.stdout = STDOUT_FILENO;
+    //process_info.stdout = open("prout2.txt", O_WRONLY | O_TRUNC | O_CREAT, S_IWUSR | S_IRUSR);
     process_info.stderr = STDERR_FILENO;
+
+
 
     printf("Fin de phase buggée, début du lancement\n");
 
     exec_process(&process_info);
+
+*/
 
     /*while (1)
     {

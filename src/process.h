@@ -8,6 +8,7 @@ Dépendances : parsing.h*/
 #include <sys/types.h>
 #include "parsing.h"
 
+
 typedef struct{
   char* path;
   char** argv;
