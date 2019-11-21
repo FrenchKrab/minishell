@@ -9,7 +9,7 @@ Dépendances : process.h*/
 /*Fonction exec_process
 Paramètre proc : informations liées au processus à executer
 Retourne 0 si tout s'est bien déroulé, et autre chose en cas d'erreur*/
-int exec_process(process_t* proc) {
+int exec_process(process* proc) {
     int child_pid = fork();     //on fork
 
     if(child_pid == 0)  //Si on est le fils

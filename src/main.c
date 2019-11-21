@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     for (char **tok=tokens; *tok!=NULL;++tok)
         printf(">%s<\n",*tok);
 
-    process_t process_info;
+    process process_info;
     process_info.path = "/bin/cat";
 
     printf("Debut de phase buggée\n");

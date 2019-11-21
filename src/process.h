@@ -8,7 +8,7 @@ Dépendances : parsing.h*/
 #include <sys/types.h>
 #include "parsing.h"
 
-typedef struct process{
+typedef struct{
   char* path;
   char** argv;
   int stdin, stdout, stderr;
@@ -19,7 +19,7 @@ typedef struct process{
   struct process* next_failure;
   struct process* next_succes;
   
-};
+}process;
 
 int exec_process(process* proc);
 
