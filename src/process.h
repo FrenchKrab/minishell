@@ -9,7 +9,7 @@ Dépendances : parsing.h*/
 #include "parsing.h"
 
 
-typedef struct{
+typedef struct process{
   char* path;
   char** argv;
   int stdin, stdout, stderr;
@@ -23,5 +23,7 @@ typedef struct{
 }process;
 
 int exec_process(process* proc);
+
+int split_cmds(char *cmds[], process *commands);
 
 #endif

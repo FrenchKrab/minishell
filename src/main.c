@@ -22,6 +22,18 @@ int main(int argc, char* argv[])
 
     while(1)
     {
+        for(size_t idx = 0; idx<MAXCMD; ++idx)
+        {
+            commands[idx].stdin = 0;
+            commands[idx].stdout = 1;
+            commands[idx].stderr = 2;
+            commands[idx].background = 0;
+            commands[idx].argv = NULL;
+            commands[idx].path = NULL;
+            commands[idx].next_failure = NULL;
+            commands[idx].next_succes = NULL;
+            commands[idx].next = NULL;
+        }
    
         printf("%s$", getenv("USER"));
         fgets(cmdline, MAXSTRSIZE, stdin);
@@ -40,6 +52,8 @@ int main(int argc, char* argv[])
             printf(">%s<\n",*tok);
         }
 */
+
+        /*
         process process_info;
 
         process_info.argv = tokens;
@@ -56,7 +70,35 @@ int main(int argc, char* argv[])
         process_info.stderr = STDERR_FILENO;
 
 
-        exec_process(&process_info);
+        exec_process(&process_info);*/
+
+        split_cmds(tokens, commands);
+
+        process *nextCommand = &commands[0];
+
+        while (nextCommand != NULL)
+        {
+            exec_process(nextCommand);
+
+            if(nextCommand->next != NULL)
+            {
+                nextCommand = nextCommand->next;
+            }
+            else
+            {
+                if(nextCommand->status == 0)
+                {
+                    nextCommand = nextCommand->next_succes;
+                }
+                else
+                {
+                    nextCommand = nextCommand->next_failure;
+                }
+            }
+        }
+        
+
+
     }
     
     /*

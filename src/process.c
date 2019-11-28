@@ -2,6 +2,9 @@
 Auteur : Alexis Plaquet, Tom Rivero
 Dépendances : process.h*/
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include <sys/wait.h>
 
 #include <sys/types.h>
@@ -37,7 +40,7 @@ int exec_process(process* proc) {
     else    //Si on est le père
     {
         proc->pid = child_pid;
-        if(proc->background!=0) //Si on ne lance pas en background
+        if(proc->background==0) //Si on ne lance pas en background
         {
             //Attendre que le fils ait terminé son execution
             waitpid(child_pid, &proc->status, 0);
@@ -52,75 +55,115 @@ int exec_process(process* proc) {
 }
 
 
-int split_cmds(char *cmds[], process *commands)
+int split_cmds(char *tokens[], process *commands)
 {
-    size_t idx = 0;
+    size_t idx = 0;     //Index du processus
+    size_t i = 0;       //Index du token actuel
+    int newCommand = 1;
 
-    for(size_t i = 0; cmds[i]!=NULL; ++i)
-    {
-        commands[idx].stdin = 0;
-        commands[idx].stdout = 1;
-        commands[idx].stderr = 2;
-        commands[idx].background = 0;
-        commands[idx].argv = cmds + i;
-        while(cmds[i] != NULL &&
-                strcmp(cmds[i], ";")!=0 &&
-                strcmp(cmds[i], ">")!=0 &&
-                strcmp(cmds[i], ">>")!=0 &&
-                strcmp(cmds[i], "<")!=0 &&
-                strcmp(cmds[i], "&")!=0 &&
-                strcmp(cmds[i], "|")!=0)
+    while(tokens[i] != NULL) {
+
+        if(newCommand == 1)
         {
-            ++i;
+            newCommand = 0;
+            commands[idx].argv = tokens + i;
+            commands[idx].path = tokens[i];
+            printf("test %s ", commands[idx].path);
         }
 
-        if(cmds[i]==NULL)
-            break;
-
-        if(strcmp(cmds[i], ";")==0)
+        if(strcmp(tokens[i], ";")==0)
         {
-            ++idx;
-            cmds[i]=NULL;
+            tokens[i]=NULL;
             commands[idx].next = commands + idx + 1;
+            //commands[idx].next_failure = commands + idx + 1;
+            //commands[idx].next_succes = commands + idx + 1;
+            ++idx;
+            ++i;
+            newCommand = 1;
+            continue;
         }
 
-        if(strcmp(cmds[i], ">")==0)
+        if(strcmp(tokens[i], ">")==0)
         {
-            commands[idx].stdout = open(cmds[i+1], O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
-            cmds[i] = NULL;
-            idx += 2;
+            commands[idx].stdout = open(tokens[i+1], O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            continue;
+        }
+        
+        if(strcmp(tokens[i], "2>")==0)
+        {
+            commands[idx].stderr = open(tokens[i+1], O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR);
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            continue;
         }
 
-        if(strcmp(cmds[i], ">>")==0)
+        if(strcmp(tokens[i], ">>")==0)
         {
-            commands[idx].stdout = open(cmds[i+1], O_CREAT | O_APPEND | O_WRONLY, S_IRUSR | S_IWUSR);
-            cmds[i] = NULL;
-            idx += 2;
+            commands[idx].stdout = open(tokens[i+1], O_CREAT | O_APPEND | O_WRONLY, S_IRUSR | S_IWUSR);
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            continue;
         }
 
-        if(strcmp(cmds[i], "<")==0)
+        if(strcmp(tokens[i], "2>>")==0)
         {
-            commands[idx].stdout = open(cmds[i+1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            cmds[i] = NULL;
-            idx += 2;
+            commands[idx].stderr = open(tokens[i+1], O_CREAT | O_APPEND | O_WRONLY, S_IRUSR | S_IWUSR);
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            continue;
         }
 
-        if(strcmp(cmds[i], "&")==0)
+        if(strcmp(tokens[i], "<")==0)
         {
-            commands[idx].background = 0;
-            cmds[i] = NULL;
-            idx += 2;
+            commands[idx].stdin = open(tokens[i+1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            continue;
+        }
+
+        if(strcmp(tokens[i], "&")==0)
+        {
+            commands[idx].background = 1;
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            newCommand = 1;
+            continue;
+        }
+
+                
+        if(strcmp(tokens[i], "||")==0)
+        {
+            commands[idx].next_succes = &commands[idx+1];
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            newCommand = 1;
+            continue;
         }
 
         
-        if(strcmp(cmds[i], "&&")==0)
+        if(strcmp(tokens[i], "&&")==0)
         {
-            commands[idx].background = 1;
             commands[idx].next_succes = &commands[idx+1];
-            cmds[i] = NULL;
-            idx += 2;
+            tokens[i] = NULL;
+            ++idx;
+            ++i;
+            newCommand = 1;
+            continue;
         }
 
+
+        i++;
+
     }
+
 
 }
