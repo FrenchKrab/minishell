@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 project(minishell)
-set(SOURCES src/process.c src/parsing.c src/main.c)
+set(SOURCES src/process.c src/parsing.c src/main.c src/builtin.c)
 add_executable(minishell ${SOURCES})
 install(TARGETS minishell DESTINATION bin)

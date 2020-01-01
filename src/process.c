@@ -12,6 +12,7 @@ Dépendances : process.h*/
 #include <fcntl.h>
 
 #include "process.h"
+#include "builtin.h"
 
 
 /*Fonction exec_process
@@ -52,9 +53,18 @@ int exec_process(process* proc) {
         //close(proc->pipe_out[1]);
 
         //Executer le processus
-        execvp(proc->path, proc->argv);
-        fprintf(stderr, "ERROR LAUNCHING THE PROCESS");
-        exit(1);
+        if(try_exec_builtin(*proc))
+        {
+            exit(0);
+        }
+        else
+        {
+            execvp(proc->path, proc->argv);
+            fprintf(stderr, "ERROR LAUNCHING THE PROCESS %s\n", proc->path);
+            exit(1);    
+        }
+        
+
     }
     else    //Si on est le père
     {

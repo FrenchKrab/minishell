@@ -8,6 +8,7 @@ Dépendances : parsing.h*/
 #include <unistd.h>
 #include "parsing.h"
 #include "process.h"
+#include "builtin.h"
 
 
 #include <sys/types.h>
@@ -19,6 +20,8 @@ int main(int argc, char* argv[])
     char cmdline[MAXSTRSIZE];
     char *tokens[MAXCMD];
     process commands[MAXCMD];
+
+    char cwd[MAXPATHSIZE];
 
     while(1)
     {
@@ -40,7 +43,9 @@ int main(int argc, char* argv[])
             commands[idx].pipe_out[1] = -1;
         }
    
-        printf("%s$", getenv("USER"));
+        getcwd(cwd, MAXPATHSIZE);
+
+        printf("%s:%s$", getenv("USER"), cwd);
         fgets(cmdline, MAXSTRSIZE, stdin);
 
 
@@ -83,8 +88,11 @@ int main(int argc, char* argv[])
 
         while (nextCommand != NULL)
         {
-            exec_process(nextCommand);
 
+            if(!try_exec_special_builtin(*nextCommand))
+            {
+                exec_process(nextCommand);
+            }
 
             if(nextCommand->next != NULL)
             {
