@@ -130,7 +130,6 @@ int set_envs(char* tokens[]) {
         {
             //On récupère la variable d'environnement correspondante et la substitue à l'élément du tableau
             char *var = getenv(elem+1);
-            printf("variable %s = %s",elem, var);
             if(var!=NULL)
                 tokens[i]=var;
             else    //Si la variable n'est pas définie on utilise la chaîne vide "" (et pas NULL)
