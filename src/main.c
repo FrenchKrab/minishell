@@ -33,6 +33,11 @@ int main(int argc, char* argv[])
             commands[idx].next_failure = NULL;
             commands[idx].next_succes = NULL;
             commands[idx].next = NULL;
+
+            commands[idx].pipe_in[0] = -1;
+            commands[idx].pipe_in[1] = -1;
+            commands[idx].pipe_out[0] = -1;
+            commands[idx].pipe_out[1] = -1;
         }
    
         printf("%s$", getenv("USER"));
@@ -79,6 +84,7 @@ int main(int argc, char* argv[])
         while (nextCommand != NULL)
         {
             exec_process(nextCommand);
+
 
             if(nextCommand->next != NULL)
             {

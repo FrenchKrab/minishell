@@ -19,7 +19,8 @@ typedef struct process{
   struct process* next;
   struct process* next_failure;
   struct process* next_succes;
-  
+  int pipe_in[2];
+  int pipe_out[2];
 }process;
 
 int exec_process(process* proc);
