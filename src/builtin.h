@@ -12,6 +12,7 @@ int try_exec_special_builtin(process);
 //Commandes internes
 void builtin_pwd(process);
 void builtin_env(process);
+void builtin_credits(process);
 
 //Commandes internes spéciales (ne créent pas de processus fils)
 void builtin_special_export(process);

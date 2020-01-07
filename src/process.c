@@ -1,6 +1,6 @@
 /*Fichier process.c: lancement de processus
 Auteur : Alexis Plaquet, Tom Rivero
-Dépendances : process.h*/
+Dépendances : process.h, builtin.h*/
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +13,26 @@ Dépendances : process.h*/
 
 #include "process.h"
 #include "builtin.h"
+
+
+
+void init_process(process* proc)
+{
+    proc->stdin = 0;
+    proc->stdout = 1;
+    proc->stderr = 2;
+    proc->background = 0;
+    proc->argv = NULL;
+    proc->path = NULL;
+    proc->next_failure = NULL;
+    proc->next_succes = NULL;
+    proc->next = NULL;
+
+    proc->pipe_in[0] = -1;
+    proc->pipe_in[1] = -1;
+    proc->pipe_out[0] = -1;
+    proc->pipe_out[1] = -1;
+}
 
 
 /*Fonction exec_process
@@ -69,6 +89,18 @@ int exec_process(process* proc) {
         {
             //Attendre que le fils ait terminé son execution
             waitpid(child_pid, &proc->status, 0);
+            if(proc->stdin != STDIN_FILENO)
+            {
+                close(proc->stdin);
+            }
+            if(proc->stdout != STDOUT_FILENO)
+            {
+                close(proc->stdout);
+            }
+            if(proc->stderr != STDERR_FILENO)
+            {
+                close(proc->stderr);
+            }
         }
         else    
         {
@@ -78,6 +110,44 @@ int exec_process(process* proc) {
     }
     return proc->status;
 }
+
+
+/** exec_process_chain: Lance l'execution de toute le chaine de commande
+ * qui commence par proc.
+ * Paramètre: proc: début de la chaine de processus
+ */
+void exec_process_chain(process proc)
+{
+    process *nextCommand = &proc;
+    while (nextCommand != NULL)
+    {   
+        //Si la commande n'est pas une commande spéciale interne au
+        //minishell, l'executer comme un processus normal. 
+        if(!try_exec_special_builtin(*nextCommand))
+        {
+            exec_process(nextCommand);
+        }
+
+        //Executer la commande suivante en respectant les eventuelles
+        //conditions d'execution
+        if(nextCommand->next != NULL)
+        {
+            nextCommand = nextCommand->next;
+        }
+        else
+        {
+            if(nextCommand->status == 0)
+            {
+                nextCommand = nextCommand->next_succes;
+            }
+            else
+            {
+                nextCommand = nextCommand->next_failure;
+            }
+        }
+    }
+}
+
 
 /*Fonction split_cmds
 Paramètres:

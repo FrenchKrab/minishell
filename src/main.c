@@ -1,19 +1,22 @@
 /*Fichier main.c: Contient la fonction main permettant l'execution du programme
 Auteur : Alexis Plaquet, Tom Rivero
-Dépendances : parsing.h*/
+Dépendances : parsing.h, process.h, builtin.h*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "parsing.h"
 #include "process.h"
 #include "builtin.h"
 
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+char minishell_version[] = "1.0";
 
 int main(int argc, char* argv[])
 {
@@ -27,25 +30,15 @@ int main(int argc, char* argv[])
     sprintf(setpidenvcmd, "$=%d", getpid());
     putenv(setpidenvcmd);
 
+    printf("           _       _     _          _ _ \n _ __ ___ (_)_ __ (_)___| |__   ___| | |\n| '_ ` _ \\| | '_ \\| / __| '_ \\ / _ \\ | |\n| | | | | | | | | | \\__ \\ | | |  __/ | |\n|_| |_| |_|_|_| |_|_|___/_| |_|\\___|_|_|");
+    printf("\nv%s - Alexis Plaquet, Tom Rivero - 2020\n###########################################\n",minishell_version);
+
     while(1)
     {
         //Initialiser toutes les données de commandes.
         for(size_t idx = 0; idx<MAXCMD; ++idx)
         {
-            commands[idx].stdin = 0;
-            commands[idx].stdout = 1;
-            commands[idx].stderr = 2;
-            commands[idx].background = 0;
-            commands[idx].argv = NULL;
-            commands[idx].path = NULL;
-            commands[idx].next_failure = NULL;
-            commands[idx].next_succes = NULL;
-            commands[idx].next = NULL;
-
-            commands[idx].pipe_in[0] = -1;
-            commands[idx].pipe_in[1] = -1;
-            commands[idx].pipe_out[0] = -1;
-            commands[idx].pipe_out[1] = -1;
+            init_process(&commands[idx]);
         }
    
         //Afficher l'utilisateur actif et le chemin, et laisser l'utilisateur
@@ -61,34 +54,7 @@ int main(int argc, char* argv[])
         split_cmds(tokens, commands);
 
         //Executer les commandes dans l'ordre
-        process *nextCommand = &commands[0];
-        while (nextCommand != NULL)
-        {   
-            //Si la commande n'est pas une commande spéciale interne au
-            //minishell, l'executer comme un processus normal. 
-            if(!try_exec_special_builtin(*nextCommand))
-            {
-                exec_process(nextCommand);
-            }
-
-            //Executer la commande suivante en respectant les eventuelles
-            //conditions d'execution
-            if(nextCommand->next != NULL)
-            {
-                nextCommand = nextCommand->next;
-            }
-            else
-            {
-                if(nextCommand->status == 0)
-                {
-                    nextCommand = nextCommand->next_succes;
-                }
-                else
-                {
-                    nextCommand = nextCommand->next_failure;
-                }
-            }
-        }
+        exec_process_chain(commands[0]);
     }
 
     return 0;
