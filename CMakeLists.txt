@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(minishell)
+include_directories(/usr/include/readline)
 set(SOURCES src/process.c src/parsing.c src/main.c src/builtin.c)
 add_executable(minishell ${SOURCES})
+target_link_libraries(minishell readline)
 install(TARGETS minishell DESTINATION bin)

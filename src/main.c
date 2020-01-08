@@ -11,12 +11,15 @@ Dépendances : parsing.h, process.h, builtin.h*/
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #include "parsing.h"
 #include "process.h"
 #include "builtin.h"
 
 
-char minishell_version[] = "1.0";
+char minishell_version[] = "1.1";
 
 int main(int argc, char* argv[])
 {
@@ -27,10 +30,11 @@ int main(int argc, char* argv[])
     char cwd[MAXPATHSIZE];      //Permet de stocker le cwd pour son affichage avant l'entrée de texte.
 
     char setpidenvcmd[16];
+
     sprintf(setpidenvcmd, "$=%d", getpid());
     putenv(setpidenvcmd);
 
-    printf("           _       _     _          _ _ \n _ __ ___ (_)_ __ (_)___| |__   ___| | |\n| '_ ` _ \\| | '_ \\| / __| '_ \\ / _ \\ | |\n| | | | | | | | | | \\__ \\ | | |  __/ | |\n|_| |_| |_|_|_| |_|_|___/_| |_|\\___|_|_|");
+    printf("\033[0;36m           _       _     _          _ _ \n _ __ ___ (_)_ __ (_)___| |__   ___| | |\n| '_ ` _ \\| | '_ \\| / __| '_ \\ / _ \\ | |\n| | | | | | | | | | \\__ \\ | | |  __/ | |\n|_| |_| |_|_|_| |_|_|___/_| |_|\\___|_|_|");
     printf("\nv%s - Alexis Plaquet, Tom Rivero - 2020\n###########################################\n",minishell_version);
 
     while(1)
@@ -44,8 +48,19 @@ int main(int argc, char* argv[])
         //Afficher l'utilisateur actif et le chemin, et laisser l'utilisateur
         //rentrer sa ligne de commande
         getcwd(cwd, MAXPATHSIZE);
-        printf("\n%s:%s$", getenv("USER"), cwd);
-        fgets(cmdline, MAXSTRSIZE, stdin);
+        char line_prefix[MAXPATHSIZE+128];
+        sprintf(line_prefix, "\033[1;33m%s\033[0m:\033[0;35m%s\033[0m$", getenv("USER"), cwd);
+        
+        char *buf = readline(line_prefix);
+
+        //Copier le buffer dans cmdline et ajouter la ligne à l'historique, puis libérer le buffer
+        //(readline faisant un malloc à chaque appel)
+        strncpy(cmdline, buf, MAXCMD);
+        if (strlen(cmdline) > 0) {
+            add_history(buf);
+        }
+        free(buf);
+
 
         //Transformer la ligne en suite de commandes.
         clean_str(cmdline);
