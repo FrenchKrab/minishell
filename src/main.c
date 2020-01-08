@@ -19,7 +19,7 @@ Dépendances : parsing.h, process.h, builtin.h*/
 #include "builtin.h"
 
 
-char minishell_version[] = "1.1";
+char minishell_version[] = "1.2";
 
 int main(int argc, char* argv[])
 {
@@ -56,11 +56,13 @@ int main(int argc, char* argv[])
         //Copier le buffer dans cmdline et ajouter la ligne à l'historique, puis libérer le buffer
         //(readline faisant un malloc à chaque appel)
         strncpy(cmdline, buf, MAXCMD);
-        if (strlen(cmdline) > 0) {
-            add_history(buf);
-        }
-        free(buf);
 
+        //Si la ligne est vide, redemander une entrée à l'utilisateur, sinon l'ajouter à l'historique.
+        if (strlen(cmdline) > 0)
+            add_history(buf);
+        free(buf);
+        if (strlen(cmdline) == 0)
+            continue;   //On ne peut le faire que là car il faut free(buf avant)
 
         //Transformer la ligne en suite de commandes.
         clean_str(cmdline);

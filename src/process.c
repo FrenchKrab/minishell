@@ -72,7 +72,7 @@ int exec_process(process* proc) {
         else
         {
             execvp(proc->path, proc->argv);
-            fprintf(stderr, "ERROR LAUNCHING THE PROCESS %s\n", proc->path);
+            fprintf(stderr, "%s : commande introuvable\n", proc->path);
             exit(1);    
         }
     }
